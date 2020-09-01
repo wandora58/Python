@@ -1,0 +1,83 @@
+
+
+エラー処理は try / except文
+-------------------------------------------
+l = [1, 2, 3]
+
+try:
+   print(l[5])
+except:
+   print('Error')
+-------------------------------------------
+>> Error
+
+
+
+エラーごと処理を変える場合
+-------------------------------------------
+l = [1, 2, 3]
+del l
+
+try:
+  print(l[5])
+except IndexError as ie:
+  print('{}'.format(ie))
+except NameError as ne:
+  print('{}'.format(ne))
+except Exception as e:    → それ以外の例外処理、あまり推奨はされていない使い方
+  print('{}'.format(e))
+-------------------------------------------
+>> name 'l' is not defied
+
+
+
+try が成功したときだけ処理を実行は else文追加
+-------------------------------------------
+l = [1, 2, 3]
+
+try:
+  print(l[0])
+except:
+  print('Error')
+else:
+  print('try OK')
+-------------------------------------------
+>> 1
+>> try OK
+
+
+
+finally は例外に関わらず処理を実行
+-------------------------------------------
+l = [1, 2, 3]
+
+try:
+  print(l[5])
+except:
+  print('Error')
+finally:
+  print('clean up')
+-------------------------------------------
+>> Error
+>> clean up
+
+
+
+自作の例外処理
+-------------------------------------------
+class UppercaseError(Exception):  → 自作エラークラス
+  pass                            → Exception 継承してそのまま用いる、何か処理を追加したいならここに書く
+
+def check():
+  words = ['APPLE', 'orange', 'banana']
+  for word in words:
+    if word.isupper():
+      raise UppercaseError(word)  → UppercaseError: word というエラーを発生
+
+try:
+  check()
+except UppercaseError as ue:
+  print('this is my fault. go next')
+-------------------------------------------
+>> this is my fault. go next
+

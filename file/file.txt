@@ -1,0 +1,286 @@
+
+
+
+with文を用いてファイル書き込み
+ → with文を用いることで f.close() が必要なくなる
+
+  ・open('file', 'w') → 上書きモードで開く
+                        file.write()で file に上書きができる
+
+  ・open('file', 'a') → 追加書き込みモードで開く
+                        file.write()で file に追加書き込みができる
+
+-----------------------------------------------------------
+with open('test.txt', 'w') as f:
+  f.write('test')                   → test.txt に test が書き込まれる
+
+with open('test.txt', 'a') as f:
+  f.write('Test')                   → test.txt に追加で Test が書き込まれ、
+  　　                                 testTest となる
+-----------------------------------------------------------
+
+
+
+ファイルの読み込み
+  ・open('file', 'r') → 読み込みモードで開く
+                         file.read()で file の内容を読み込める
+
+    test.txt
+      AAA
+      BBB     の場合
+-----------------------------------------------------------
+with open('test.txt', 'r') as f:
+  print(f.read())  →  全て一気に読み込む
+-----------------------------------------------------------
+>> AAA
+>> BBB
+
+-----------------------------------------------------------
+while True:
+  line = f.readline()  →  一行ずつ読み込む
+  print(line, end='')  →  print はデフォルトで改行が入っているので改行を消す
+  if not line:
+    break
+-----------------------------------------------------------
+>> AAA
+>> BBB
+
+-----------------------------------------------------------
+while True:
+  chenk = 2             → chunk = 文字数
+  line = f.read(chunk)  → chunk の文字数分読み込む
+  print(line)
+  if not line:
+    break
+-----------------------------------------------------------
+>> AA
+>> A   →  AAA▫︎ この □ には実際には改行が入っている
+>>
+>> BB
+>> B
+
+
+
+
+seek を用いて移動する
+
+  test.txt
+    AAA
+    BBB    の場合
+-----------------------------------------------------------
+with open('test.txt', 'r') as f:
+  print(f.tell())    → 開始位置が 0 番目
+  print(f.read(1))   → 1文字だけ読み込む
+
+  f.seek(5)  →  開始位置を 5文字移動
+                AAA¥n  0123
+                BB     45
+
+  print(f.read(1))   → 1文字だけ読み込む
+  f.seek(2)
+  print(f.read(1))   → これは引き継がれず常に最初から
+-----------------------------------------------------------
+>> 0
+>> A
+>> B
+>> A
+
+
+
+書き込みしてから読み込む方法
+-----------------------------------------------------------
+s = """\
+    AAA
+    BBB
+    """
+
+with open('test.txt', 'w+') as f:  → 書き込みしてから読み込むモードは w+
+  f.write(s)
+  f.seek(0)       → 書き込みしたので開始位置が最後になっているので最初に戻す
+-----------------------------------------------------------
+
+
+
+テンプレート
+
+  test.txt
+    Hi &name.  → 置き換えたい変数の前に $ を付ける
+    $contents
+----------------------------------------------------------
+import string  → string をインポート
+
+with open('test.txt', 'r') as f:
+  t = string.Template(f.read())                                → string.Tmeplate() で文字列を受け取って
+
+contents = t.substitute(name='Mike', contents='How are you?')  → substitute() で置き換え
+print(contents)
+----------------------------------------------------------
+>> Hi Mike.
+>> How are you?
+
+
+
+csvファイルの書き込み読み込み
+  辞書やリストの一括書き込みができる、便利だよ
+----------------------------------------------------------
+import csv
+
+with open('test.csv', 'w') as csv_file:
+  fieldnames = ['Name', 'Count']
+  writer = csv.DictWriter(csv_file, fieldnames=fieldnames) → ヘッダー名は filednames でリストとして渡す
+  writer.writeheader()  → ヘッダーの書き込み
+
+  writer.writerow({'Name': 'A', 'Count': 1})
+  writer.writerow({'Name': 'B', 'Count': 2})  → 実際の値は辞書で書き込む
+
+with open('test.csv', 'r') as csv_file:
+  reader = csv.DictReader(csv_file)
+  for row in reader:
+    print(row['Name'], row['Count'])
+----------------------------------------------------------
+>> A 1
+>> B 2
+
+
+
+ファイル操作
+  覚えるべきライブラリは os, pathlib, glob, shutil
+----------------------------------------------------------
+import os
+
+  print(os.getcwd())  → 現在のパスを取得
+
+  print(os.path.exists('text.txt'))  → 指定した ファイル or ディレクトリがあるかどうか
+  print(os.path.isfile('text.txt'))  → 指定したのはファイルかどうか
+  print(os.path.isdir('text.txt'))   → 指定したのはディレクトリかどうか
+
+  os.rename('test.txt', 'renamed.txt')      → ファイル名の書き換え
+  os.symlink('renamed.txt', 'symlink.txt')  → 同期したファイルを作成、どちらかのファイルを変更するともう一方にも反映される
+
+  os.mkdir('testdir')  → ディレクトリの作成
+  os.rmdir('testdir')  → ディレクトリの削除(ディレクトリが空の時のみ有効)
+
+  os.mkdir('testdir')
+  os.mkdir('testdir/testdir2')
+  print(os.listdir('testdir'))  → 指定ディレクトリ以下にあるディレクトリをリストで全て表示
+
+----------------------------------------------------------
+import pathlib
+  pathlib.Path('empty.txt').touch()  → 空のファイルを作成
+  os.remove('empty.txt')             → ファイルの削除
+
+----------------------------------------------------------
+import glob
+  pathlib.Path('testdir/testdir2/empty.txt').touch()
+  print(glob.glob('testdir/testdir2/*'))  → 指定ディレクトリ以下にあるファイルをリストで全て表示
+
+----------------------------------------------------------
+import shutil
+  shutil.copy('testdir/testdir2/empty.txt',
+              'testdir/testdir2/empty2.txt')  → ファイルをコピー
+
+  shutil.rmtree('testdir')  → 指定ディレクトリ以下の全てのディレクトリとファイルを削除
+
+----------------------------------------------------------
+
+
+
+tarfile/zipfile の圧縮展開
+----------------------------------------------------------
+import tarfile
+
+  with tarfile.open('test.tar.gz', 'w:gz') as tr:
+    tr.add('testdir')              → testdir を圧縮して test.tar.gz を作成
+
+  with tarfile.open('test.tar.gz', 'r:gz') as tr:
+    tr.extractall(path='testtar')  → testtar ディレクトリ以下に test.tar.gz を展開
+
+
+import glob
+import zipfile
+
+  with zipfile.ZipFile('test.zip', 'w') as z:
+    for f in glob.glob('testdir/**', recuresive=True):  → glob は  * で同一階層の全てのファイルを抽出
+      z.write(f)                              　　　　　　　  　　　  ** として recursive=True とすると最下層までの全てのファイル、ディレクトリの一覧を取得
+    z.write('testdir')
+    z_write(testdir/test.txt)
+
+  with zipfile.ZiFile('test.zip', 'r') as z:
+    z.exstractall('testzar')       → testtar ディレクトリ以下に test.zip を展開
+----------------------------------------------------------
+
+
+
+tempfile で一時的なファイルを作る
+  テストや zip ファイルの読み込みなどの際に利用
+----------------------------------------------------------
+import tempfile
+
+with tempfile.TemporayFile(mode='w+') as t:
+  t.write('hello')
+  t.seek(0)
+  print(t.read())
+----------------------------------------------------------
+>> hello
+
+
+
+subrocess でコマンドを実行
+----------------------------------------------------------
+import subprocess
+
+subprocess.run(['ls'])  → ターミナル上で ls コマンドを実行したときと同じ処理が走る
+
+p1 = subprocess.Popen(['ls', '-al'], stdout=subprocess.PIPE)
+p2 = subprocess.Popen(['grep', 'test'], stdin=p1.stdout, stdout=subprocess.PIPE)
+p1.stdout.close()
+output = p2.communicate()[0]
+print(output)  → パイプを使うときはこんな感じ
+----------------------------------------------------------
+
+
+
+datetime
+----------------------------------------------------------
+import datetime
+
+now = datetime.datetime.now()  → 今の時間を取得
+print(now)
+
+today = datetime.date.today()  → 今日の日付を取得
+print(today)
+
+print(today.strftime('%d/%m/%y'))  → フォーマットを変更
+print(today)
+
+t = datetime(hour=1, minute=10, second=5, microxecond=100)  → 自分で指定した時間を作成
+print(t)
+
+delta = datetime.timedelta(weeks=1)  → 日付や時間の加減をしたいときは datetime.timedelta を用いる
+print(today)
+print(today+delta)
+----------------------------------------------------------
+>> 2020-06-30 20:17:54.507527
+>> 2020-06-30
+>> 30/06/2020
+>> 01:10:05:000100
+>> 2020-06-30
+>> 2020-07-07
+
+
+
+時間を活用したバックアップファイルの作成
+----------------------------------------------------------
+import os
+import shutil
+
+file_name = 'test.txt'
+
+if os.path.exists(file_name):
+  shutil.copy(file_name, '{}.{}'.format(
+    file_name, datetime.datetime.now().strftime(%y_%m_%d-%H_%M_%S)))  → ファイル名に時間をつけてバックアップファイルを作る
+----------------------------------------------------------
+
+
+
+

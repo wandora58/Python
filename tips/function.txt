@@ -1,0 +1,52 @@
+
+
+enumerate関数：リストのインデックスと値がまとめて返ってくる
+  for i, fruit in enumerate(['apple', 'banana', 'orange']):
+    print(i, fruit)
+     >> 0 apple
+        1 banana
+        2 orange
+
+
+zip関数：複数のリストの値がまとめて返ってくる
+  days = ['Mon', 'Tue', 'Wed']
+  fruits = ['apple', 'banana', 'orange']
+  drinks = ['coffee', 'tea', 'beer']
+
+  for day, fruit, drink in zip(days, fruits, drinks):
+    print(day, fruit, drink)
+     >> Mon apple coffee
+        Tue banana tea
+        Wed orange beer
+
+
+ord関数：数値とアルファベットの相互変換
+
+  数値(1〜26) → アルファベット(A〜Z)の一文字変換
+    num2alpha = lambda c: chr(c+64)
+    num2alpha(3) >> C
+
+  数値 → アルファベットの複数文字変換
+    def num2alpha(num):
+      if num<=26:
+          return chr(64+num)
+      elif num%26==0:
+          return num2alpha(num//26-1)+chr(90)
+      else:
+          return num2alpha(num//26)+chr(64+num%26)
+
+  アルファベット(A〜Z)→数値(1〜26)の一文字変換
+    alpha2num = lambda c: ord(c) - ord('A') + 1
+    alpha2num('Y') >> 25
+
+  アルファベット → 数値の複数文字変換
+    def alpha2num(alpha):
+      num=0
+      for index, item in enumerate(list(alpha)):
+        num += pow(26,len(alpha)-index-1)*(ord(item)-ord('A')+1)
+      return num
+
+
+
+
+

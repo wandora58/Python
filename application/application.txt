@@ -1,0 +1,5 @@
+
+MVC モデル
+  M : 動作の model
+  V : 見栄えの views, template を引っ張ってきて制御
+  C : 制御する control

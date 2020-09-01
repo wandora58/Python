@@ -1,0 +1,45 @@
+
+t = (1, 2, 3, 4, 5)
+
+タプルは操作、つまり代入や要素抜き出しが不可能！ → 値をいじられたくないときに利用　
+  t[0] = 100
+  >> Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+     TypeError: 'tuple' object does not support item assignment
+
+
+宣言は()じゃなくても , をつけるだけでOK
+  t = 1, 2, 3
+  type(t) >> <class 'tuple'>
+
+  t = 1,
+  type(t) >> <class 'tuple'>
+  t >> (1,)
+
+
+タプル同士の足し算は可能
+  new_t = (1, 2, 3) + (4, 5, 6)
+  new_t >> (1, 2, 3, 4, 5, 6)
+
+
+タプルのアンパッキング
+  new_t = (10, 20)
+  x, y = new_t
+  print(x, y) >> 10 20 → タプルのそれぞれに対応する値が代入される
+
+  x, y = 10, 20 → これもタプルのアンパッキングを利用している
+
+
+アンパッキングを利用した値の入れ替え
+  a = 100
+  b = 200
+
+  a, b = b, a
+  print(a, b) >> 200 100 → 値が入れ替わる
+
+
+
+
+
+
+

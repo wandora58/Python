@@ -1,0 +1,71 @@
+
+デバッガ：プログラムを一時停止したり再開しながら少しずつ実行して、動作確認すること
+        pythonでは確かめたい行(ブレークポイント)の上に import pdb; pdb.set_trace() をおいて実行する
+
+  例) debug.py のソースコード
+  import sys
+
+  def log(args):
+    print args
+
+  def main(args):
+    log(args)
+
+  import pdb;pdb.set_trace()  →  main 関数実行前から1行ずつ確認開始
+  main(sys.argv)
+
+  --------------------
+  python debug.py
+  > /tmp/debug.py(12)<module>()
+  -> main(sys.argv)
+
+  実際の停止位置を l(ist) コマンドで確認して現在行の前後のソースコードを表示
+    (Pdb) l
+     7
+     8     def main(args):
+     9         log(args)
+    10
+    11     import pdb;pdb.set_trace()
+    12  -> main(sys.argv)
+
+
+  次に進めるためには s(tep) コマンド
+    (Pdb) s
+    --Call--
+    > /tmp/debug.py(8)main()
+    -> def main(args):
+
+    (Pdb) l
+     3     import sys
+     4
+     5     def log(args):
+     6         print args
+     7
+     8  -> def main(args):   → 次に進んで main 関数に入っている
+     9         log(args)
+    10
+    11     import pdb;pdb.set_trace()
+    12     main(sys.argv)
+
+
+  引数を確認するには a(rgs) コマンド
+    (Pdb) a
+    args = ['debug.py']  → sys.argsは コマンドライン引数と呼ばれる
+                           python a.py なら ['a.py']
+                           python a.py bb なら ['a.py', 'bb'] が返される
+
+
+  引数の型を確認するには p コマンド
+    (Pdb) p type(args)
+    <type 'list'>
+
+
+  次のブレイクポイントまで実行するには c(ontinue) コマンド
+    (Pdb) c
+    ['debug.py']
+
+
+
+
+
+

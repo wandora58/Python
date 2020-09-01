@@ -1,0 +1,137 @@
+
+
+importの記述で気をつけること
+・組み込み、サードパーティ、自作の順で一行ずつ開けること
+・それぞれアルファベット順にすること
+・print(パッケージ名.__file__) でパスがわかる
+・print(sys.path) で通っているパスがわかる
+
+
+フォルダ表記に便利な記号
+    ┣ ┠ ┝ ├
+    ┫ ┨ ┥ ┤
+    │ ┃
+    ─ ━
+    ┌ ┏ ┓ ┐
+    └ ┗ ┛ ┘
+
+
+
+コマンドライン引数
+--------------------------------------------
+import sys
+print(sys.argv)  → コマンドライン引数を取得
+--------------------------------------------
+python main.py command1 command2   → main.py command1 command2 がコマンドライン引数
+>> ['main.py', 'command1', 'command2']
+
+
+
+パッケージフォルダの作成と読み込み
+  フォルダ構成
+    Python/
+　   ├ main.py
+　   └ package/
+       ├ __init__.py  → パッケージを読み込む時に最初に読まれる、パッケージには必ず必要
+       └ utils.py     → 自作パッケージを格納する
+
+
+package/utils.py
+---------------------------------------------
+def say_hello():
+  print('hello')
+---------------------------------------------
+
+
+main.py
+---------------------------------------------
+from package import utils  → package フォルダの utils ファイルを読み込む
+utils.say_hello()          → 基本的に読み込むのはファイル！ 関数を読み込まないこと！
+---------------------------------------------
+>> hello
+
+
+
+
+パッケージ内に複数の関数がある時は * でインポートして __init__.py を書き換える
+
+  フォルダ構成
+    Python/
+　   ├ main.py
+　   └ package/
+        ├ __init__.py  → パッケージを読み込む時に最初に読まれる、パッケージには必ず必要
+        ├ tools.py
+        └ utils.py
+
+
+package/utils.py
+---------------------------------------------
+def say_hello():
+  print('hello')
+
+def say_good():
+  print('good')                 → utils.py には複数の関数が存在
+---------------------------------------------
+
+
+package/__init__.py
+---------------------------------------------
+__all__ = ['utils']            → package フォルダの utils ファイルを読み込み対象に置く
+---------------------------------------------
+
+
+main.py
+---------------------------------------------
+from package.utils import *    → utils ファイルの全ての関数を読み込む
+
+print(utils.say_hello())
+print(utils.say_good())
+---------------------------------------------
+>> hello
+>> good
+
+
+
+パッケージを配布する時は setup.py を作成する
+
+  フォルダ構成
+  　Python/
+  　 ├ main.py
+  　 ├ setup.py → ここに置く
+  　 └ package/
+  　   ├ __init__.py
+  　   ├ tools.py
+  　   └ utils.py
+
+
+setup.py
+---------------------------------------------
+from distutils.core import setup
+setup(
+  name='sample_package',
+  version='1.0.0',
+  package=['package'],
+  url='',
+  license='Free',
+  author='nakajima',
+  author_email='',
+  description='sample package'
+)
+---------------------------------------------
+python setup.py sdist   → distフォルダと MANIFESTファイルができる
+
+  新しいフォルダ構成
+    Python/
+     ├ main.py
+     ├ setup.py
+     ├ package/
+        ├ __init__.py
+        ├ tools.py
+        └ utils.py
+     ├ dist/
+        └ sample_package-1.0.0.tar.gz  → これを web ページに置いて配布できる　
+     └ MANIFEST                        → どういったパッケージを含めたか
+
+
+
+

@@ -1,0 +1,104 @@
+
+d = {'x': 10, 'y': 20}
+
+辞書はキーで操る
+  d['x'] >> 10
+
+
+キーの追加
+  d[1] = 30
+  d >> {'x': 10, 'y': 20, 1: 30}
+
+
+異なる生成の仕方
+  d = dict(x=10, y=20)
+  d >> {'x': 10, 'y': 20}
+
+
+キーのみ取得
+  d.keys() >> dict_keys(['x', 'y'])
+
+
+値のみ取得
+  d.values() >> dict_values([10, 20])
+
+
+異なる辞書を用意して上書き
+  d2 = dict(x=1000, z=30)
+  d.update(d2) >> {'x': 1000, 'y': 20, 'z': 30} → xは上書きされ、zは追加される
+
+
+キーを指定して値の取得
+  d['x'] >> 1000
+  d['a'] >> Traceback (most recent call last):
+            File "<stdin>", line 1, in <module>
+            KeyError: 'a' → キーにないのはエラーになる
+
+  d.get('x') >> 1000
+  d.get('a') >> Nonetype → Nonetype型の空白が返ってくる
+
+
+キーを指定して抜き出し
+  p = d.pop('x')
+  p >> 1000
+  d >> {'y': 20, 'z': 30} → 'x': 1000は抜き出される
+
+
+キーを指定して値削除
+  del d['x']
+  d >> {'y': 20, 'z': 30}
+
+
+全て削除して空辞書に
+  d.clear() >> {}
+
+
+キーがあるか確認
+  'x' in d >> True
+  'a' in d >> False
+
+
+辞書のコピー
+  x = {'a': 1}
+
+  y = x
+  y['a'] = 1000
+  x >> {'a': 1000}
+  y >> {'a': 1000} → 辞書型も参照渡し
+
+  z = x.copy()
+  z['a'] = 1000
+  x >> {'a': 1}
+  y >> {'a': 1000} → コピーすることで値渡し
+
+
+辞書の包括表記
+  w = ['mon', 'tue', 'wed']
+  f = ['coffee', 'milk', 'water']
+
+  d = {}
+  for x, y in zip(w, f):
+    d[x] = y
+       ↓
+  d = {x: y for x, y in zip(w,f)} → {最初にキー:値、次にzipでまとめたfor文}
+
+
+辞書のソート
+  ranking = {
+    'A': 100,
+    'B': 85,
+    'C': 95
+  }
+
+  print(sorted(ranking))
+   >> ['A', 'B', 'C']  キーでソートされる
+
+  print(sorted(ranking, key=ranking.get, reverse=True))
+   >> ['A', 'C', 'B']  辞書.get(キー)で値を取得し、ソートのキーにする
+   　　　　　　　　　　　　ソートは昇順なので、reverse=True にすることで値が大きい順にソートできる
+
+  print(sorted(ranking.items()))
+   >> [('A', 100), ('B', 85), ('C', 95)]  キーを基準に両ソート
+
+  print(sorted(ranking.items()), key = lambda x : x[1])
+   >> [('A', 100), ('C', 95), ('B', 95)]

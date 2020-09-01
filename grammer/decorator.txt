@@ -1,0 +1,59 @@
+
+
+デコレーター：関数を装飾、つまり既存関数の処理の前後に新しい処理を付け加えることができる
+-------------------------------------------------
+def deco(func):                 → func関数には test関数が入る
+  def wrapper(*args, **kargs):  → 引数には a,b が入る　
+    print('--start--')          → まず最初に --start-- が出力
+    func(*args, **kargs)        → funcには test関数が入っているので test関数実行
+    print('--end--')            → 最後に --end-- が出力
+  return wrapper
+
+@deco → 関数の上に @デコレート関数 をつける
+def test(a,b):
+  print(a+b)
+
+test(1,2)
+-------------------------------------------------
+>> --start--
+>> Hello Decorator
+>> --end--
+
+
+
+デコレーターが2つの場合
+-------------------------------------------------
+def func_info(func):
+  def wrapper(*args, **kargs):
+    print('func:', func.__name__)  → func = add_num
+    print('args:', args)           → args = (10,20)
+    print('kargs:', kargs)
+    result = func(*args, **kargs)  → add_num(10, 20)実行
+    print('result:', result)
+    return result                  → print_info に戻る
+  return wrapper
+
+
+def print_info(func):
+  def wrapper(*args, **kargs):
+    print('--start--')             → まず--start--が出力
+    result = func(*args, **kargs)  → func_infoに add_num(10, 20) が流れる
+    print('--end--')
+    return result
+  return wrapper
+
+
+@print_info 　　→ 最初にここに流れる
+@func_info
+def add_num(a, b):
+  return a+b
+
+
+print(add_num(10, 20))
+-------------------------------------------------
+>> --start--
+>> func: add_num
+>> args: (10, 20)
+>> kargs: {}
+>> result: 30
+>> --end--

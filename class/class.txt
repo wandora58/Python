@@ -1,0 +1,392 @@
+
+
+クラスの初期化とクラス変数
+---------------------------------------------------
+class Person:
+  def __init__(self, name): → クラスを生成した時に必ず実行、クラスを生成した時に引数を取るならここに入る
+    self.name = name        → 自分自身の name という変数に引数の name を代入
+
+  def say_something(self, num):
+    print('I am {}'.format(self.name))
+    self.run(num)        → 自分自身の run という関数を実行
+
+  def run(self, num):
+    print('run' * num)
+
+
+person = Person('Mike')
+person.say_something(2)  → クラスの say_something 関数を引数をとって実行　
+print(person.name)       → クラス変数へのアクセスは . で出来る
+---------------------------------------------------
+>> I am Mike
+>> runrun
+>> Mike
+
+
+
+コンストラクタとデストラクタ
+---------------------------------------------------
+class Person:
+  def __init__(self):   → クラスを生成した時に必ず実行する、これをコンストラクタと呼ぶ
+
+  def __del__(self):    → クラスが使われなくなった時に必ず実行する、これをデストラクタと呼ぶ　
+
+person = Person()   → コンストラクタ実行
+del person          → デストラクタ実行　
+---------------------------------------------------
+
+
+
+クラスの継承
+---------------------------------------------------
+class Car:
+  def run(self):
+    print('run')
+
+class ToyotaCar(Car):  → Carクラスを継承 = クラスの変数とメソッドを引き継ぐ
+  pass
+
+
+toyota_car = ToyotaCar()
+toyota_car.run()
+---------------------------------------------------
+>> run
+
+
+
+メソッドのオーバーライド
+---------------------------------------------------
+class Car:
+  def run(self):
+    print('run')
+
+class ToyotaCar(Car):
+  def run(self):       → 継承した Carクラスのメソッド run をオーバーライド(上書き)
+    print('run fast')    処理が変わる
+
+
+toyota_car = ToyotaCar()
+toyota_car.run()
+---------------------------------------------------
+>> run fast
+
+
+
+super による親クラスのメソッドの呼び出し
+---------------------------------------------------
+class Car:
+  def __init__(self, model):
+    self.model = model
+
+  def run(self):
+    print('run')
+
+class ToyotaCar(Car):
+  def __init__(self, model, enable_auto_run=False):
+    super().__init__(model)  → 親クラス、つまり Car クラスの __init__ メソッドを実行
+                               これで self.model = model になる
+
+    self.enable_auto_run = enable_auto_run
+
+
+toyota_car = ToyotaCar('Lexus')
+print(toyota_car.model)
+print(toyota_car.enable_auto_run) >> False
+---------------------------------------------------
+>> Lexus
+>> False
+
+
+
+クラスの外から変数にアクセス
+  変数の前に アンダースコア1個  → @property と @変数名.setter である条件を満たす時のみアクセス可能
+  変数の前に アンダースコア2個  → クラスの外からはアクセスできない(エラーになる)、クラス内部では操作可能
+---------------------------------------------------
+class Car:
+  def __init__(self, model, enable_auto_run=False, passwd='123'):
+    self.model = model
+    self._enable_auto_run = enable_auto_run  → 書き換えられたくないクラス変数はアンダースコアを変数の前につける
+    self.passwd = passwd
+
+  @property　
+  def enable_auto_run(self):             → 書き換えられたくないクラス変数がある時は
+    return self._enable_auto_run         → @property でデコーレトして関数化する
+
+  @enable_auto_run.setter
+  def enable_auto_run(self, is_enable):  → ある条件に合致した時だけ書き換え可能にする時は
+    if self.passwd == '456':             → @クラス変数.setter でデコレートして関数化し
+      self._enable_auto_run = is_enable  → is_enable を置く　
+    else:
+      raise ValuError
+
+car = Car('Model S', passwd='456')  → この場合は条件に合致しているので ValueError にならない
+car.enable_auto_run = True
+
+car = Car('Model S', passwd='123')  → この場合は条件に合致していないので ValueError になる　
+car.enable_auto_run = True
+---------------------------------------------------
+
+   ↓ （もっと分かりやすく)
+
+
+ゲッターとセッター
+  プライベート変数をクラスの外からアクセスするためのメソッド
+  プライベート変数 = _プロパティ名
+
+  ゲッター: 変数の値を取得するだけのメソッド
+
+　  　　　   @property
+            def プロパティ名(self):
+              return self.プライベート変数名
+
+
+  セッター: 変数に値をセットするメソッド
+
+            @プロパティ名.setter
+            def プロパティ名(self, val):
+              self.プライベート変数名 = val
+
+---------------------------------------------------
+class Cat:
+  def __init__(self):
+    self._name = 'ミケ' 　 → クラス外からアクセスできないプライベート変数
+
+  @property               → name変数にゲッタープロパティを設定
+  def name(self):           これでクラスの外から Cat.name で値を取得できる
+    return self._name
+
+  @name.setter            → name変数にセッタープロパティを設定
+  def name(self, name):　　　これでクラスの外から Cat.name = '' で値をセットできる
+    self._name = name
+
+cat = Cat()
+print(cat.name)  >> 'ミケ'   → ゲッタープロパティで値を取得
+cat.name = 'タマ'            → セッタープロパティで値をセット
+print(cat.name)  >> 'タマ'
+---------------------------------------------------
+>> ミケ　　
+>> タマ
+
+
+
+外からクラスに値を追加する時に気をつけること
+---------------------------------------------------
+class T:
+  def __init__(self, enable_t=False):
+    self.__enable_t = enable_t
+
+t = T()
+t.name = 'Mike'
+t.age = 20
+print(t.name, t.age)    → 値を追加できる　
+
+t.__enable_t = 'XXXX'   → アンダースコア2個つけているもの値を代入することはできるが
+print(t.__enable_t)     → 本来ならアクセスしてはいけないのでやらないこと！
+---------------------------------------------------
+>> Mike 20
+>> XXXX
+
+
+
+抽象クラス：親のクラスで継承して欲しいメソッドがある時は abc を使う
+---------------------------------------------------
+import abc
+
+
+class Person(metaclass=abc.ABCMeta):  → 親のクラスは metaclass=abc.ABCMeta とする
+  def __init__(self, age=1):
+    self.age = age
+
+  @abc.abstractmethod   → 継承したクラスの中で作らなければいけないメソッドの上に @abc.abstractmethod をつける
+  def drive(self):
+    pass
+
+
+class Baby(Person):
+  def __init__(self, age=1):
+    if age < 18:
+      super.__init__(age)
+    else:
+      raise ValueError
+
+  def drive(self):                → 例えば Personクラスを継承した Babyクラス で @abc.abstractmethod をつけたメソッドが
+    raise Exception('No drive')   → 実装されていない場合 adult = Adult() で呼び出した時にエラーになる
+
+
+class Adult(Person):
+  def __init__(self, age=18):
+    if age >= 18:
+      super.__init__(age)
+    else:
+      raise ValuError
+
+  def drive(self):  → 例えば Personクラスを継承した Adultクラス で @abc.abstractmethod をつけたメソッドが
+    print('ok')     → 実装されていない場合 adult = Adult() で呼び出した時にエラーになる
+
+
+class Car:
+  def __init__(self, model=None):
+    self.model = model
+
+  def ride(self, person):  → person にクラスがはいる
+    person.drive()
+
+
+baby = Baby()
+adult = Adult()
+car = Car()
+car.ride(adult) >> ok
+car.ride(adult) >> Exception: No drive
+---------------------------------------------------
+
+
+多重継承
+---------------------------------------------------
+class Person:
+  def talk(self):
+    print('talk')
+
+  def run(self):
+    print('person run')
+
+
+class Car:
+  def run(self):
+    print('car run')
+
+
+class PersonCarRobot(Person, Car):    → クラスを複数継承、同じメソッドがある場合は左側が優先される
+  def fly(self):
+    print('fly')
+
+
+person_car_robot = PersonCarRobot()
+person_car_robot.talk()
+person_car_robot.run()    → 左側の Person クラスが優先されて run は Personクラスの run() が用いられる
+person_car_robot.fly()
+---------------------------------------------------
+>> talk
+>> person run
+>> fly
+
+
+
+クラス変数
+---------------------------------------------------
+class Person:
+
+  kind = 'human'  　　　　　　　　　→ __init__ で書く必要のないクラス変数はこのようにも書ける
+                                 → リストはこのようには書かないこと
+  def __init__(self, name):
+    self.name = name
+
+  def who_are_you(self):
+    print(self.name, self.kind)　→ これも内部で操る時は self をつけること　
+
+
+a = Person('A')
+a.who_are_you()
+
+b = Person('B')
+b.who_are_you()
+---------------------------------------------------
+>> A human
+>> B human
+
+
+
+クラスメソッドとスタティックメソッド
+---------------------------------------------------
+class Person:
+
+  kind = 'human'
+
+  def __init__(self):
+    self.x = 100
+
+  @classmethod
+  def what_is_your_kind(cls):
+    return cls.kind
+
+a = Person()    → ()をつけることでオブジェクトが生成(__init__ が実行される)
+print(a.x)
+
+b = Person      → ()をつけていないのでオブジェクトではない(__init__ が実行されない)
+print(b.x)
+
+print(b.kind)                    → ただし,__init__ の外で定義した変数と
+print(b.what_is_your_kind())     → @classmethod と cls を用いた関数にはアクセスできる
+---------------------------------------------------
+>> human
+>> Error
+>> human
+>> human
+
+
+
+特殊メソッド
+
+① __str__
+---------------------------------------------------
+class Word:
+  def __str__(self):
+    return 'Word!!!'  → str() や print() でオブジェクトを読み込んだ時に 'Word' が返る　
+
+w = Word()
+srt(w)
+print(w)
+---------------------------------------------------
+>> 'Word!'
+>> 'Word!'
+
+
+
+② __len__
+---------------------------------------------------
+class Word:
+  def __init__(self, text):
+    self.text = text
+
+  def __len__(self):       → len() でオブジェクトを読み込んだ時に長さを返す　
+    return len(self.text)
+
+w = Word('text')
+print(len(w))     → len()関数を使うように書ける、本来なら len(w.text) と書かなきゃ
+---------------------------------------------------
+>> 4
+
+
+
+③ __add__
+---------------------------------------------------
+class Word:
+  def __init__(self, text):
+    self.text = text
+
+  def __add__(self, word):　　 → クラス変数の足し算を返す
+    return self.text.lower() + word.text.lower()
+
+w = Word('text')
+w2 = Word('####')
+print(w1 + w2) 　　→ 普通の足し算のように書ける、本来なら w.text + w2.textと書かなきゃ
+---------------------------------------------------
+>> text####
+
+
+
+④ __eq__
+---------------------------------------------------
+class Word:
+  def __init__(self, text):
+    self.text = text
+
+  def __eq__(self, word):     → クラス変数が同じかどうかを返す
+    return self.text.lower() == word.text.lower()
+
+w = Word('text')
+w2 = Word('text')
+print(w == w2)        →  __eq__ がない場合だとオブジェクト比較になるので False になる
+                      →  __eq__ があるのでクラス変数での比較可能
+---------------------------------------------------
+>> True
+

@@ -1,0 +1,99 @@
+
+ショートカットキー
+  ファイル内検索 : command f
+  フォルダ内検索 : command shift f
+
+  選択文字列で検索し、次に現れる同一文字列を選択 : command d
+  選択文字列で検索し、全ての同一文字列を選択 : command ctrl g
+
+  矩形選択 : multi-cursor をインストールした後 : option ↑ or ↓
+
+
+変数のコメントは上
+  #apple price
+  apple = 100
+
+
+行が長いとき
+  n = 1 + 2 \
+      + 3
+
+  s = 'aaa' \
+      'bbb'　　　→  s = 'aaabbb'
+
+  l = ['a', 'b', 'c',
+       'd', 'e', 'f']
+
+
+関数の引数と返り値の宣言
+  def function(引数1: 引数1の型, 引数2: 引数2の型) -> 返り値の型:
+    処理
+
+
+関数の説明：docstyle
+  def example_func(param1, param2):
+    """
+    Example function with types documented in the docstrings.
+
+    Args:
+        param1 (int): The first parameter
+        param2 (str): The second parameter
+
+    Returns:
+        bool: The return value. True for success. False otherwise.
+
+    Note:
+        see details at: http://www.emrgmegmemgfjnnfn ← これは 80 文字超えても可能
+    """
+    return True
+
+
+パッケージを用いた確認
+  pip install pep8
+  pip install flake8
+  pip install pylint
+
+  使い方はそれぞれ pep8 main.py / flake8 main.py / pylint main.py
+
+
+
+コードスタイル
+  ・改行は Tab ではなく 4つのスペース にすること
+      x = {
+          'test': 1  ← これも 4つのスペース 開けること
+      }
+
+　・関数やクラス間は 2行の改行
+　　関数内の関数同士は 1行の改行
+
+　・文字列の '' と ""　の使い分け
+  　基本的には ''
+    "{}".format('') のように代入するときだけ ""
+
+  ・クラス宣言と関数宣言
+  　class First:               → 先頭大文字
+  　class SecondFirst(First):  → クラスはアンダースコアで繋げず、そのまま繋げて書く
+  　class ThirdSecondFirst(SecondFirst):
+
+  　def grren_tree():          → 関数や変数はアンダースコアで繋げる
+
+
+
+Python の書き方
+　・for ループより ジェネレーター の方が速いので ジェネレーター を使う
+
+　・簡単な引数は lambda を用いる
+ 　  lambda 引数: 引数の処理
+
+　・if 文を一行で書く
+     y = None
+     x = 1 if y else 2  >> y=None より x=2
+
+
+
+
+
+
+
+
+
